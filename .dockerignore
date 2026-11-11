@@ -1,0 +1,12 @@
+.git
+.idea
+.vscode
+.claude
+target
+data
+src/main/resources/static
+mobile/node_modules
+mobile/.expo
+mobile/dist
+mobile/.git
+**/*.log

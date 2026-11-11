@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "expo-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "mobile", "run", "web", "--", "--port", "8081"],
+      "port": 8081
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "D:/IdeaProjects/Share-bill/mvnw.cmd",
+      "runtimeArgs": ["-q", "-f", "D:/IdeaProjects/Share-bill/pom.xml", "spring-boot:run"],
+      "port": 8686
+    }
+  ]
+}

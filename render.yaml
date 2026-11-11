@@ -1,0 +1,22 @@
+# Cấu hình Render (Blueprint). Render đọc file này khi bạn chọn "New → Blueprint" và trỏ tới repo GitHub.
+# Mỗi lần push lên nhánh main, Render tự build lại và chạy bản mới.
+services:
+  - type: web
+    name: share-bill
+    runtime: docker
+    plan: free
+    region: singapore        # gần Việt Nam nhất
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      # Chuỗi kết nối Neon, dạng postgresql://user:pass@host/neondb?sslmode=require
+      - key: DATABASE_URL
+        sync: false
+      # Mật khẩu chung để vào app (tự đặt, gửi cho bạn bè)
+      - key: APP_PASSWORD
+        sync: false
+      - key: H2_CONSOLE
+        value: "false"
+      - key: CORS_ORIGINS
+        value: ""
