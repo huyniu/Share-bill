@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
 
 import { Button, colors, Input } from '@/components/ui';
@@ -14,29 +14,41 @@ type State = 'checking' | 'locked' | 'offline' | 'ok';
 export function AuthGate({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State>('checking');
   const [slow, setSlow] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
-  const check = useCallback(async () => {
-    setState('checking');
-    setSlow(false);
+  // Kiểm tra mật khẩu đã lưu mỗi lần mở app (và mỗi lần bấm "Thử lại")
+  useEffect(() => {
+    let cancelled = false;
     // Server miễn phí ngủ sau 15 phút; báo cho người dùng nếu phải chờ lâu
     const timer = setTimeout(() => setSlow(true), 4000);
-    try {
-      await api.checkPassword(await loadPassword());
-      setState('ok');
-    } catch (e) {
-      setState(e instanceof UnauthorizedError ? 'locked' : 'offline');
-    } finally {
+    loadPassword()
+      .then((saved) => api.checkPassword(saved))
+      .then(
+        () => !cancelled && setState('ok'),
+        (e) => !cancelled && setState(e instanceof UnauthorizedError ? 'locked' : 'offline'),
+      )
+      .finally(() => clearTimeout(timer));
+    return () => {
+      cancelled = true;
       clearTimeout(timer);
-    }
-  }, []);
+    };
+  }, [attempt]);
 
-  useEffect(() => {
-    check();
-    return onUnauthorized(() => {
-      clearPassword();
-      setState('locked');
-    });
-  }, [check]);
+  // Đang dùng mà server báo sai mật khẩu (ví dụ đã đổi APP_PASSWORD) thì quay về màn hình nhập
+  useEffect(
+    () =>
+      onUnauthorized(() => {
+        clearPassword();
+        setState('locked');
+      }),
+    [],
+  );
+
+  const retry = () => {
+    setState('checking');
+    setSlow(false);
+    setAttempt((n) => n + 1);
+  };
 
   if (state === 'ok') return <>{children}</>;
 
@@ -56,7 +68,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
       <View style={s.center}>
         <Text style={s.title}>Không kết nối được</Text>
         <Text style={s.muted}>Kiểm tra mạng của điện thoại rồi thử lại.</Text>
-        <Button title="Thử lại" onPress={check} style={{ alignSelf: 'stretch' }} />
+        <Button title="Thử lại" onPress={retry} style={{ alignSelf: 'stretch' }} />
       </View>
     );
   }

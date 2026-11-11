@@ -1,16 +1,21 @@
-# Share Bill – Backend
+# Share Bill
 
-Backend chia tiền cho nhóm, hỗ trợ **nhiều người cùng trả** một hóa đơn và **tối giản số lần chuyển khoản** để cả nhóm hết nợ.
+App chia tiền cho nhóm, hỗ trợ **nhiều người cùng trả** một hóa đơn và **tối giản số lần chuyển khoản** để cả nhóm hết nợ.
 
-- Java 17, Spring Boot 4, Spring Data JPA, H2 (lưu vào file `./data/`)
+- Backend: Java 17, Spring Boot 4, Spring Data JPA; H2 ở máy tính, PostgreSQL (Neon) trên mạng
+- App: Expo + React Native Web trong [mobile/](mobile/README.md), dùng trên iPhone qua Safari
+- **Đưa lên mạng miễn phí: xem [DEPLOY.md](DEPLOY.md)**
 - Mọi số tiền là **số nguyên, đơn vị đồng** (không dùng số thực nên không có sai số)
 
-## Chạy
+## Chạy ở máy tính
 
 ```bash
+cd mobile && npm install && npm run build:web && cd ..   # build giao diện (làm lại khi sửa app)
 ./mvnw spring-boot:run      # Windows PowerShell: .\mvnw.cmd spring-boot:run
-./mvnw test                 # chạy test
+./mvnw test                 # chạy test (gồm cả test trên PostgreSQL nhúng)
 ```
+
+Ở máy tính không cần mật khẩu. Muốn thử màn hình mật khẩu thì đặt biến môi trường `APP_PASSWORD` trước khi chạy.
 
 Server chạy tại `http://localhost:8686`. Nó vừa phục vụ API, vừa phục vụ app web
 (bản build của [mobile/](mobile/README.md), nằm trong `src/main/resources/static`).
@@ -87,13 +92,20 @@ src/main/java/com/sharebill/
 ├── model/       Entity JPA: BillGroup, Member, Expense, Payment
 ├── repository/  Spring Data repository
 ├── service/     GroupService: nghiệp vụ, kiểm tra dữ liệu
-└── web/         REST controller, DTO, xử lý lỗi, CORS
+└── web/         REST controller, DTO, xử lý lỗi, CORS, mật khẩu, phục vụ app web
 ```
+
+## Biến môi trường
+
+| Biến | Mặc định | Ý nghĩa |
+|---|---|---|
+| `PORT` | `8686` | Cổng server (Render tự đặt) |
+| `DATABASE_URL` | (trống: dùng H2) | Chuỗi kết nối Neon `postgresql://...` |
+| `APP_PASSWORD` | (trống: không cần mật khẩu) | Mật khẩu chung để vào app |
+| `H2_CONSOLE` | `true` | Bật trang /h2-console |
+| `CORS_ORIGINS` | `http://localhost:8081,...` | Địa chỉ web khác được gọi API (dev) |
 
 ## Việc tiếp theo
 
-- ~~App iPhone~~: đã có trong [mobile/](mobile/README.md), dùng qua Safari
-- Đưa lên server có HTTPS để dùng được khi không ở nhà
 - Tạo mã VietQR cho từng lần chuyển khoản
-- Đăng nhập và mời bạn vào nhóm bằng link
-- Đổi H2 sang PostgreSQL khi triển khai lên server
+- Mỗi nhóm một link mời riêng thay cho mật khẩu chung

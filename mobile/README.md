@@ -1,11 +1,13 @@
 # Share Bill – App (Expo, chạy dạng web app trên iPhone)
 
+> Muốn dùng ở mọi nơi (không cần bật máy tính)? Xem [../DEPLOY.md](../DEPLOY.md).
+
 App viết bằng Expo SDK 58 + Expo Router + TypeScript. Bản web được build vào backend Spring Boot,
 nên iPhone chỉ cần mở bằng **Safari** rồi **Thêm vào MH chính**. Không cần App Store hay Expo Go.
 
 ## Dùng trên iPhone
 
-1. Build app web vào backend (chỉ cần làm lại mỗi khi sửa code app). Chạy trong thư mục `Share-bill/mobile`:
+1. Build app web vào backend (lần đầu và mỗi khi sửa code app). Chạy trong thư mục `Share-bill/mobile`:
    ```bash
    npm run build:web
    ```
